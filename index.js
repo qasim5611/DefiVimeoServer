@@ -1,7 +1,8 @@
 const express = require("express");
 const { v4: uuidv4 } = require("uuid");
 require("dotenv").config();
-var Storage = require("node-storage");
+const mongoose = require("mongoose");
+
 require('fs')
 const connectDb = require("./config/connection");
 const app = express();
@@ -194,6 +195,14 @@ app.use(express.static("./build"));
 // app.use("*", (req, res) => {
 //   res.sendfile("./build/index.html");
 // });
+
+app.get("/*", function (req, res) {
+  res.sendFile(path.join(__dirname, "./build/index.html"), function (err) {
+    if (err) {
+      res.status(500).send(err);
+    }
+  });
+});
 
 connectDb();
 

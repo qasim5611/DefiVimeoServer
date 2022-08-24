@@ -1,0 +1,27 @@
+{
+  "files": {
+    "main.css": "/static/css/main.6246ced7.chunk.css",
+    "main.js": "/static/js/main.daa8cbc9.chunk.js",
+    "main.js.map": "/static/js/main.daa8cbc9.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.9fba9042.js",
+    "runtime-main.js.map": "/static/js/runtime-main.9fba9042.js.map",
+    "static/css/2.68b64559.chunk.css": "/static/css/2.68b64559.chunk.css",
+    "static/js/2.221a81a6.chunk.js": "/static/js/2.221a81a6.chunk.js",
+    "static/js/2.221a81a6.chunk.js.map": "/static/js/2.221a81a6.chunk.js.map",
+    "static/js/3.0f03524d.chunk.js": "/static/js/3.0f03524d.chunk.js",
+    "static/js/3.0f03524d.chunk.js.map": "/static/js/3.0f03524d.chunk.js.map",
+    "index.html": "/index.html",
+    "static/css/2.68b64559.chunk.css.map": "/static/css/2.68b64559.chunk.css.map",
+    "static/css/main.6246ced7.chunk.css.map": "/static/css/main.6246ced7.chunk.css.map",
+    "static/js/2.221a81a6.chunk.js.LICENSE.txt": "/static/js/2.221a81a6.chunk.js.LICENSE.txt",
+    "static/media/binance.4927bd5a.png": "/static/media/binance.4927bd5a.png",
+    "static/media/metamask.dabbc866.png": "/static/media/metamask.dabbc866.png"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.9fba9042.js",
+    "static/css/2.68b64559.chunk.css",
+    "static/js/2.221a81a6.chunk.js",
+    "static/css/main.6246ced7.chunk.css",
+    "static/js/main.daa8cbc9.chunk.js"
+  ]
+}

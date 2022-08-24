@@ -23,7 +23,7 @@ console.log("client", client);
 
 const UserID = process.env.VIMEO_USER_ID;
 
-console.log("UserID", UserID);
+console.log("Vimeo UserID", UserID);
 
 const Courses = {
   addCourse: async function (req, res) {

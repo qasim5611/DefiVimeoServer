@@ -70,6 +70,14 @@ const VideoSchema = new mongoose.Schema({
     trim: true,
     max: 64,
   },
+  learning_desc: {
+    type: String,
+    trim: true,
+    max: 64,
+  },
+  learning_tags: {
+    type: Array,
+  },
 });
 
 

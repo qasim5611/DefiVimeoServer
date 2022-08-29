@@ -2,6 +2,8 @@ const express = require("express");
 const { v4: uuidv4 } = require("uuid");
 require("dotenv").config();
 const mongoose = require("mongoose");
+const defiRoutes = require("./routes/defi");
+
 
 require('fs')
 const connectDb = require("./config/connection");
@@ -187,7 +189,18 @@ app.post("/deleteVideoByid", SiteCourses.deleteVideoByid);
 // Vimeo ALL Videos agains Metamask Ids Watched Time Recorder
 app.get("/getperwatched", SiteCourses.getperwatched);
 app.post("/perWatchedRecord", SiteCourses.perWatchedRecord);
+app.post("/getTotalWatchedByUserId", SiteCourses.getTotalWatchedByUserId);
 
+
+app.post("/getSpecificVideo", SiteCourses.getSpecificVideo);
+
+
+app.post("/setDefaultPercentageZero", SiteCourses.setDefaultPercentageZero);
+
+
+
+// *************************  Aqib Bai Route ****************************
+app.use("/defi", defiRoutes);
 
 ///////////////////////////////////////
 app.use(express.static("./build"));

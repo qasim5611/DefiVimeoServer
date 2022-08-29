@@ -115,6 +115,115 @@ const Courses = {
     }
   },
 
+  getTotalWatchedByUserId: async function (req, res) {
+    try {
+      // const user = await watchedSchema.find();
+      
+      let metamask_id = req.body.userMetamaskId;  //  User to MetaMask Id
+      // let myperc = req.body.perWatched;  // % Watched By User to Specific Video
+    
+
+
+      const allWatched = await watchedSchema.find().where("metamask_id").equals(metamask_id);
+
+      console.log("allWatched", allWatched);
+
+      if(allWatched){
+        return res.send({
+          msg: "Find Successfully",
+          allWatched,
+        });
+
+      }
+
+
+   
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+
+  setDefaultPercentageZero: async function (req, res) {
+    try {
+   
+      let metamaskId = req.body.userMetamaskId; 
+
+      const allVideos = await VideosSchema.find();
+
+      if(allVideos){
+      
+       let arrOfUri = [];
+        for (const type of allVideos) {  
+          // console.log(`A JavaScript type is: ${type.myVideoUri}`);
+          let idd = type.myVideoUri;
+          arrOfUri.push(idd);
+     //  User to MetaMask Id
+      // let isMatched = watchedSchema.find( { metamask_id: { $nin: [metamaskId] } , videoId: { $nin: [idd] } } )
+          
+        }
+
+        console.log("arrOfUri", arrOfUri);
+        let allMatched =  await watchedSchema.find({  "videoId" : { "$in": arrOfUri },  "metamask_id" : metamaskId })
+        if(allMatched){
+          console.log(allMatched);
+          let arrOfvideoId = [];
+          for (const types of allMatched) {  
+            // console.log(`A JavaScript type is: ${type.myVideoUri}`);
+            let idds = types.videoId;
+            arrOfvideoId.push(idds);
+       //  User to MetaMask Id
+        // let isMatched = watchedSchema.find( { metamask_id: { $nin: [metamaskId] } , videoId: { $nin: [idd] } } )
+            
+          }
+          // all Video ids that already have Percentage Watched against specific Metamask Id
+          console.log("arrOfvideoId", arrOfvideoId);
+          
+          // Now find that not and add it bydefault 0%
+
+          // const allVideos = await VideosSchema.find();
+          let allAnyFind =  await VideosSchema.find({  "myVideoUri" : { "$nin": arrOfvideoId } })
+
+          if(allAnyFind){
+            console.log("allAnyFind", allAnyFind);
+            // console.log("allAnyFind", allAnyFind.myVideoUri);
+            console.log("allAnyFind", allAnyFind[0].myVideoUri);
+
+            let ZeroObj = new watchedSchema({
+              "metamask_id": metamaskId,
+              "percentageWatched" : "0",
+              "videoId" : allAnyFind[0].myVideoUri,
+            });
+      
+            let result = await ZeroObj.save();
+            if(result){
+              return res.send({
+                msg: "added 0%",
+              });
+
+            }
+
+
+          }
+        }
+
+
+  
+      }
+
+
+   
+
+   
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  
+
+  
+
   
 
   perWatchedRecord: async function (req, res) {
@@ -187,6 +296,29 @@ const Courses = {
       console.log(error);
     }
   },
+
+  getSpecificVideo: async function (req, res) {
+    try {
+      let uri = req.body.VideoUrlId;
+      let videoId = uri.slice(31,40);
+
+      console.log("videoId qas", videoId)
+      const specificVideos = await VideosSchema.find().where("myVideoUri").equals(videoId);
+    if (specificVideos) {
+      return res.send({
+        msg: "Find Successfully",
+        specificVideos,
+      });
+    }
+      
+    
+     
+
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  
 
 
   getCourseByid: async function (req, res) {
@@ -310,7 +442,7 @@ const Courses = {
   },
 
   addToVimeo: async function (req, res) {
-    let { courseName, moduleName, title, length } = req.body;
+    let { courseName, moduleName, title, length, videoLength, description, learnList } = req.body;
     try {
       let myuri = [];
       var data = fs.readFileSync('./config.json'),
@@ -386,7 +518,7 @@ const Courses = {
               //////////////////////////////////////////////////////               
               let newVideo = new VideosSchema({
                 title,
-                length,
+                length: videoLength,
                 courseName,
                 moduleName,
                 userID: `${UserID}`,
@@ -396,6 +528,10 @@ const Courses = {
                 manage_link: videoDetailResp.data.manage_link,
                 player_embed_url: videoDetailResp.data.player_embed_url,
                 privacy: videoDetailResp.data.privacy.view,
+                learning_desc: description,
+                learning_tags: learnList.split(",")
+
+                
               });
               let result = await newVideo.save();
               // Noew its Time to Remove Temporary File/MP4 from uploads using **config.json** 
@@ -525,7 +661,7 @@ const Courses = {
               let videoDetailResp = await axios.request(compVideoDetail);
               let myData = {
                 title,
-                length,
+                length: videoLength,
                 courseName,
                 moduleName,
                 userID: `${UserID}`,
@@ -604,10 +740,12 @@ const Courses = {
 
 
   deleteCourseById: async function (req, res) {
-    let find = await Course.findById(req.body.id);
+    let findtodel = await Course.findById(req.body.id);
+    let find = await Course.find().where("_id").equals(req.body.id);
+
     if (find) {
-      console.log("find.uri", find.uri);
-      let FolderUri = find.uri.split("projects/")[1];
+      console.log("find.uri", find[0].uri);
+      let FolderUri = find[0].uri.split("projects/")[1];
       console.log("FolderUri", FolderUri);
 
       let headersList = {
@@ -622,11 +760,30 @@ const Courses = {
       }
       let response = await axios.request(reqOptions);
       if (response) {
-        await find.delete();
-        return res.send({
-          msg: "Deleted Successfully",
-          find,
-        });
+        await findtodel.delete();
+
+        // let vedioUriCourse = find[0].uri.split("projects/")[1];
+        let isDeleteVideo = await VideosSchema.findOneAndDelete({ folderUri: FolderUri });
+
+        if(isDeleteVideo){
+          return res.send({
+            msg: "Deleted Successfully",
+            find,
+          });
+
+        }
+
+        else{
+          return res.send({
+            msg: "Deleted Successfully",
+            find,
+          });
+        }
+
+
+
+
+      
 
       }
 
@@ -663,15 +820,39 @@ const Courses = {
         }
         let response = await axios.request(reqOptions);
         console.log(response.data);
+
+
+
+
+
         if (response) {
           let isupdate = await Course.findOneAndUpdate({ _id: user_id }, data, {
             isNew: true,
           });
           if (isupdate) {
-            return res.send({
-              msg: "Course Updated Successfully",
-              isupdate,
-            });
+
+      // const user = await Course.find().where("_id").equals(req.query.id);
+
+            let isfind = await Course.find().where("_id").equals(user_id);
+            if(isfind){
+              
+             console.log("user", isfind[0].uri);
+            //  let vedioUriCourse = user.uri;
+      
+            let vedioUriCourse = isfind[0].uri.split("projects/")[1];
+            let isupdateVideo = await VideosSchema.findOneAndUpdate({ folderUri: vedioUriCourse }, 
+              { $set: {'courseName': req.body.title } }, { isNew: true,  });
+            
+
+              return res.send({
+                msg: "Course Updated Successfully",
+                isupdate,
+              });
+           
+          }
+          
+            
+         
           }
         }
       }
@@ -699,7 +880,19 @@ const Courses = {
         method: "DELETE",
         headers: headersList,
       }
+      let reqOptions2 = {
+        // DELETEhttps://api.vimeo.com/videos/{video_id}
+        url: `https://api.vimeo.com/videos/${VideoUri}`,
+        method: "DELETE",
+        headers: headersList,
+      }
       let response = await axios.request(reqOptions);
+
+      setTimeout( async function(){
+        let response2 = await axios.request(reqOptions2);
+        console.log("response2", response2);
+     }, 2000);//wait 2 seconds
+
       if (response) {
         await find.delete();
         return res.send({

@@ -661,7 +661,7 @@ const Courses = {
               let videoDetailResp = await axios.request(compVideoDetail);
               let myData = {
                 title,
-                length: videoLength,
+                length: length,
                 courseName,
                 moduleName,
                 userID: `${UserID}`,
